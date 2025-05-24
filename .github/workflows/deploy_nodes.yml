@@ -1,0 +1,49 @@
+name: Deploy Nodes
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  deploy_nodes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      
+      - name: Install Python dependencies
+        run: pip install requests
+      
+      - name: Deploy Multiply to Node
+        id: deploy_multiply
+        env:
+          TAKTILE_FLOW_ID: 123
+          TAKTILE_NODE_ID: 1
+          SRC_CODE_PATH_FILE: Multiply.py
+          TAKTILE_API_KEY: ${{ secrets.TAKTILE_API_KEY }}
+        run: python scripts/deploy_node.py "${{ env.TAKTILE_FLOW_ID }}" "${{ env.TAKTILE_NODE_ID }}" "${{ env.SRC_CODE_PATH_FILE }}" "${{ env.TAKTILE_API_KEY }}"
+        continue-on-error: true
+      
+      - name: Deploy Summarize to Node
+        id: deploy_summarize
+        env:
+          TAKTILE_FLOW_ID: 123
+          TAKETILE_NODE_ID: 2
+          SRC_CODE_PATH_FILE: Summarize.py
+          TAKTILE_API_KEY: ${{ secrets.TAKTILE_API_KEY }}
+        run: python scripts/deploy_node.py "${{ env.TAKTILE_FLOW_ID }}" "${{ env.TAKTILE_NODE_ID }}" "${{ env.SRC_CODE_PATH_FILE }}" "${{ env.TAKTILE_API_KEY }}"
+        continue-on-error: true
+
+      - name: Report Deployment Status
+        if: always()
+        run: |
+          echo "Deployment Results:"
+          echo "  Multiply node: ${{ steps.deploy_multiply.outcome }}
+          echo "  Summarize node: ${{ steps.deploy_summarize.outcome }}
