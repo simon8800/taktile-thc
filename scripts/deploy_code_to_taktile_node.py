@@ -130,6 +130,7 @@ if __name__ == "__main__":
         deploy_code_to_taktile_node(FLOW_ID, NODE_ID, SRC_CODE_FILE_PATH, API_KEY)
     elif node_status == "not found":
         print(f"Error: Node ID '{NODE_ID}' does not exist")
+        sys.exit(1)
     elif node_status == "wrong type":
         print(f"Error: Node with ID '{NODE_ID}' is not of type 'code_node'")
         sys.exit(1)
